@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Min restaurant – Q-Genbrug</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; }
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <a class="sidebar-logo" href="/restaurant-dashboard.html">
+        <div class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div><div class="logo-name">Q-Genbrug</div><div class="logo-sub">Restaurant</div></div>
+    </a>
+    <div class="sidebar-nav">
+        <div class="nav-section">Navigation</div>
+        <a class="nav-item active" href="/restaurant-dashboard.html" data-page="/restaurant-dashboard.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+            Mine anmodninger
+        </a>
+    </div>
+    <div class="sidebar-footer">
+        <div class="user-tile" onclick="logout()">
+            <div class="user-avatar" id="user-avatar">–</div>
+            <div class="user-info"><div class="user-name" id="user-name">…</div><div class="user-role" id="user-role"></div></div>
+            <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+    </div>
+</aside>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Mine anmodninger</div>
+            <div class="page-subtitle">Anmod om pantafhentning og følg status.</div>
+        </div>
+    </div>
+    <main>
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header"><span class="card-title">Afhentningsanmodninger</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Dato</th><th>Antal poser</th><th>Status</th><th>Afsluttet</th><th></th></tr></thead>
+                        <tbody id="anmodninger-list">
+                        <tr><td colspan="5" class="empty">Indlæser…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom:16px;">Anmod om afhentning</h2>
+                <p id="ingen-restaurant-advarsel" style="display:none;color:var(--red);font-size:0.82rem;margin-bottom:12px;padding:10px;background:var(--red-bg);border-radius:var(--radius-sm);">
+                    Din konto er ikke tilknyttet en restaurant. Kontakt admin.
+                </p>
+                <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+                    <label style="display:flex;flex-direction:column;gap:5px;font-size:0.75rem;font-weight:500;color:var(--text3);">Restaurant
+                        <input id="restaurant-navn" class="form-control" readonly style="opacity:0.6;" placeholder="Henter…" />
+                    </label>
+                    <label style="display:flex;flex-direction:column;gap:5px;font-size:0.75rem;font-weight:500;color:var(--text3);">Dato
+                        <input id="anm-dato" type="date" class="form-control" />
+                    </label>
+                    <label style="display:flex;flex-direction:column;gap:5px;font-size:0.75rem;font-weight:500;color:var(--text3);">Antal poser
+                        <input id="anm-poser" type="number" min="1" class="form-control" placeholder="Valgfrit" />
+                    </label>
+                    <button class="btn btn-primary" id="submit-btn" onclick="opretAnmodning()">Klar til afhentning</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/restaurant-dashboard.js"></script>
+</body>
+</html>
