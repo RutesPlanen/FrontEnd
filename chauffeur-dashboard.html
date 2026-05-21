@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ventende afhentninger – Q-Genbrug</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+  <a class="sidebar-logo" href="/chauffeur-dashboard.html">
+    <div class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <div><div class="logo-name">Q-Genbrug</div><div class="logo-sub">Chauffør</div></div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="nav-section">Navigation</div>
+    <a class="nav-item active" href="/chauffeur-dashboard.html" data-page="/chauffeur-dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Ventende afhentninger</a>
+    <a class="nav-item" href="/map.html" data-page="/map.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Rutekort</a>
+    <a class="nav-item" href="/kosten.html" data-page="/kosten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Mine udgifter</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-tile" onclick="logout()">
+      <div class="user-avatar" id="user-avatar">–</div>
+      <div class="user-info"><div class="user-name" id="user-name">…</div><div class="user-role" id="user-role"></div></div>
+      <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
+  </div>
+</aside>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Ventende afhentninger</div>
+      <div class="page-subtitle">Anmodninger klar til afhentning i dag.</div>
+    </div>
+    <div class="page-actions">
+      <a href="/map.html" class="btn btn-secondary btn-sm">🗺 Se rutekort</a>
+    </div>
+  </div>
+  <main>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Anmodninger</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Restaurant</th><th>Adresse</th><th>Telefon</th><th>Dato</th><th>Antal poser</th><th>Status</th><th></th></tr></thead>
+          <tbody id="anmodninger-list"><tr><td colspan="7" class="empty">Indlæser…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/chauffeur-dashboard.js"></script>
+</body>
+</html>
