@@ -62,7 +62,10 @@ async function startRedigering(id) {
 
 function afbrydRedigering() {
     document.getElementById('edit-id').value = '';
-    document.getElementById('form-bruger').reset();
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-email').value = '';
+    document.getElementById('input-password').value = '';
+    document.getElementById('input-role').value = '';
     document.getElementById('form-title').textContent = 'Opret bruger';
     document.getElementById('submit-btn').textContent = 'Opret';
     document.getElementById('cancel-btn').style.display = 'none';
@@ -96,20 +99,18 @@ async function aktiverBruger(id, btn) {
     }
 }
 
-document.getElementById('form-bruger').addEventListener('submit', async e => {
-    e.preventDefault();
+async function submitBruger() {
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
     const id = document.getElementById('edit-id').value;
-    const fd = new FormData(e.target);
-    const restaurantId = fd.get('restaurant_id');
     const body = {
-        name: fd.get('name'),
-        email: fd.get('email'),
-        role: fd.get('role')
+        name: document.getElementById('input-name').value,
+        email: document.getElementById('input-email').value,
+        role: document.getElementById('input-role').value
     };
-    const pw = fd.get('password');
+    const pw = document.getElementById('input-password').value;
     if (pw) body.password = pw;
+    const restaurantId = document.getElementById('input-restaurant').value;
     if (restaurantId) body.restaurant = { id: Number(restaurantId) };
 
     try {
@@ -128,7 +129,7 @@ document.getElementById('form-bruger').addEventListener('submit', async e => {
     } finally {
         btn.disabled = false;
     }
-});
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadRestaurantDropdownBrugere();
