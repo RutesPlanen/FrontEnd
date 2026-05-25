@@ -19,4 +19,8 @@ jobs:
         run: docker build -t frontend .
 
       - name: Kør Docker container
-        run: docker run -d -p 80:80 --name frontend-test frontend && sleep 3 && curl -f http://localhost || exit 1
+        run: |
+          docker run -d -p 80:80 --name frontend-test frontend
+          sleep 5
+          docker logs frontend-test
+          curl -f http://localhost || exit 1
