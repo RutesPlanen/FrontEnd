@@ -15,14 +15,8 @@ jobs:
       - name: Checkout kode
         uses: actions/checkout@v4
 
-      - name: Sæt Java 21 op
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+      - name: Byg Docker image
+        run: docker build -t frontend .
 
-      - name: Byg med Maven
-        run: mvn clean install -DskipTests
-
-      - name: Kør tests
-        run: mvn test
+      - name: Kør Docker container
+        run: docker run -d -p 80:80 --name frontend-test frontend && sleep 3 && curl -f http://localhost || exit 1
