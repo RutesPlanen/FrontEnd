@@ -44,3 +44,4 @@ profile:
 
 #Specify Qodana linter for analysis (Applied in CI/CD pipeline)
 linter: jetbrains/qodana-jvm:2025.2
+version: "1.0"
