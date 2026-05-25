@@ -1,7 +1,7 @@
 services:
 
   backend:
-    build: ../NewBackEndProject
+    build: ../BackEnd
     ports:
       - "8080:8080"
     dns:
