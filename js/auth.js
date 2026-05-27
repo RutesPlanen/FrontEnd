@@ -50,6 +50,7 @@ async function requireLogin() {
     }
 
     document.body.style.visibility = 'visible';
+    if (typeof visPantBobbel === 'function') visPantBobbel();
 }
 
 function logout() {

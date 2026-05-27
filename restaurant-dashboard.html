@@ -59,18 +59,18 @@
                 <p id="ingen-restaurant-advarsel" style="display:none;color:var(--red);font-size:0.82rem;margin-bottom:12px;padding:10px;background:var(--red-bg);border-radius:var(--radius-sm);">
                     Din konto er ikke tilknyttet en restaurant. Kontakt admin.
                 </p>
-                <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+                <form id="form-anmodning" style="display:grid;grid-template-columns:1fr;gap:12px;">
                     <label style="display:flex;flex-direction:column;gap:5px;font-size:0.75rem;font-weight:500;color:var(--text3);">Restaurant
-                        <input id="restaurant-navn" class="form-control" readonly style="opacity:0.6;" placeholder="Henter…" />
+                        <input id="restaurant-navn" name="restaurant" class="form-control" readonly style="opacity:0.6;" placeholder="Henter…" />
                     </label>
                     <label style="display:flex;flex-direction:column;gap:5px;font-size:0.75rem;font-weight:500;color:var(--text3);">Dato
-                        <input id="anm-dato" type="date" class="form-control" />
+                        <input id="anm-dato" name="date" type="date" class="form-control" />
                     </label>
                     <label style="display:flex;flex-direction:column;gap:5px;font-size:0.75rem;font-weight:500;color:var(--text3);">Antal poser
-                        <input id="anm-poser" type="number" min="1" class="form-control" placeholder="Valgfrit" />
+                        <input id="anm-poser" name="pantAmount" type="number" min="1" class="form-control" placeholder="Valgfrit" />
                     </label>
-                    <button class="btn btn-primary" id="submit-btn" onclick="opretAnmodning()">Klar til afhentning</button>
-                </div>
+                    <button class="btn btn-primary" id="submit-btn" type="submit">Klar til afhentning</button>
+                </form>
             </div>
         </div>
     </main>

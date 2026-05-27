@@ -1,41 +1,32 @@
 let map;
-let routeLayer;
+let markers = [];
+let routePolyline = null;
 let warehouseAddress = '';
 let currentStops = [];
 let startCoords = null;
 let lagerCoords = null;
 
-const BACKEND = 'http://localhost:8080/api';
-
-function authHeaders() {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
-    };
-}
-
 async function backendPost(path, body) {
-    const res = await fetch(BACKEND + path, {
+    return apiFetch(path, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify(body)
     });
-    if (res.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login.html';
-        return;
-    }
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
 }
 
 function initMap() {
-    map = L.map('map').setView([55.6761, 12.5683], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 11,
+        center: { lat: 55.6761, lng: 12.5683 },
+        mapTypeControl: false,
+        fullscreenControl: false,
+        streetViewControl: false,
+        styles: [
+            { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+            { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+        ]
+    });
+
+    hentKonfig();
 }
 
 async function hentKonfig() {
@@ -85,11 +76,30 @@ async function tegneRute(orderedCoords) {
     const coords = orderedCoords.map(([lat, lng]) => [lng, lat]);
     const data = await backendPost('/map/directions', { coordinates: coords });
 
-    if (routeLayer) map.removeLayer(routeLayer);
-    routeLayer = L.geoJSON(data, {
-        style: { color: '#1a73e8', weight: 5, opacity: 0.85 }
-    }).addTo(map);
-    map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
+    if (routePolyline) {
+        routePolyline.setMap(null);
+        routePolyline = null;
+    }
+
+    const routeCoords = [];
+    if (data.features && data.features[0].geometry.coordinates) {
+        data.features[0].geometry.coordinates.forEach(([lng, lat]) => {
+            routeCoords.push({ lat, lng });
+        });
+    }
+
+    routePolyline = new google.maps.Polyline({
+        path: routeCoords,
+        geodesic: true,
+        strokeColor: '#1a73e8',
+        strokeOpacity: 0.9,
+        strokeWeight: 5,
+        map: map
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+    routeCoords.forEach(c => bounds.extend(c));
+    map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
 
     const summary = data.features[0].properties.summary;
     return {
@@ -99,23 +109,33 @@ async function tegneRute(orderedCoords) {
 }
 
 function clearMarkers() {
-    map.eachLayer(layer => {
-        if (layer instanceof L.Marker) map.removeLayer(layer);
-    });
+    markers.forEach(m => m.setMap(null));
+    markers = [];
 }
 
 function tilfoejMarkoer(coords, label, popupHtml, farve = '#1a73e8') {
-    L.marker(coords).addTo(map)
-        .bindPopup(popupHtml)
-        .setIcon(L.divIcon({
-            className: '',
-            html: `<div style="background:${farve};color:white;width:28px;height:28px;
-                border-radius:50%;display:flex;align-items:center;justify-content:center;
-                font-weight:700;font-size:12px;border:2px solid white;
-                box-shadow:0 2px 8px rgba(0,0,0,.3);">${label}</div>`,
-            iconSize: [28, 28],
-            iconAnchor: [14, 14]
-        }));
+    const marker = new google.maps.Marker({
+        position: { lat: coords[0], lng: coords[1] },
+        map: map,
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 14,
+            fillColor: farve,
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 2
+        },
+        label: {
+            text: String(label),
+            color: '#ffffff',
+            fontWeight: 'bold',
+            fontSize: '11px'
+        }
+    });
+
+    const infoWindow = new google.maps.InfoWindow({ content: popupHtml });
+    marker.addListener('click', () => infoWindow.open(map, marker));
+    markers.push(marker);
 }
 
 function renderStopListe(stops) {
@@ -215,7 +235,7 @@ document.getElementById('btn-beregn').addEventListener('click', async () => {
     document.getElementById('stop-panel').style.display = 'none';
     document.getElementById('stats-bar').style.display = 'none';
     clearMarkers();
-    if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+    if (routePolyline) { routePolyline.setMap(null); routePolyline = null; }
 
     try {
         setLoading('Geocoder adresser…');
@@ -272,7 +292,7 @@ document.getElementById('btn-beregn').addEventListener('click', async () => {
         tilfoejMarkoer(startCoords, '▶', '<strong>Din startposition</strong>', '#34a853');
         currentStops.forEach((s, i) =>
             tilfoejMarkoer(s.coords, i + 1, `<strong>${i + 1}. ${s.navn}</strong><br>${s.adresse}`));
-        tilfoejMarkoer(lagerCoords, '🏭', `<strong>Lager</strong><br>${warehouseAddress}`, '#ea4335');
+        tilfoejMarkoer(lagerCoords, '●', `<strong>Lager</strong><br>${warehouseAddress}`, '#ea4335');
 
         visStats(currentStops.length, distance, duration);
         renderStopListe(currentStops);
@@ -301,7 +321,7 @@ document.getElementById('btn-opdater').addEventListener('click', async () => {
         tilfoejMarkoer(startCoords, '▶', '<strong>Din startposition</strong>', '#34a853');
         currentStops.forEach((s, i) =>
             tilfoejMarkoer(s.coords, i + 1, `<strong>${i + 1}. ${s.navn}</strong><br>${s.adresse}`));
-        tilfoejMarkoer(lagerCoords, '🏭', `<strong>Lager</strong><br>${warehouseAddress}`, '#ea4335');
+        tilfoejMarkoer(lagerCoords, '●', `<strong>Lager</strong><br>${warehouseAddress}`, '#ea4335');
 
         visStats(currentStops.length, distance, duration);
         renderStopListe(currentStops);
@@ -310,9 +330,4 @@ document.getElementById('btn-opdater').addEventListener('click', async () => {
     } finally {
         stopLoading();
     }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    hentKonfig();
 });

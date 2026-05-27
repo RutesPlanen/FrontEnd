@@ -57,12 +57,9 @@ async function sletUdgift(id, btn) {
         btn.disabled = false;
     }
 }
-
-document.getElementById('form-expense').addEventListener('submit', async e => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
+async function gemUdgift() {
+    const btn = document.getElementById('exp-submit');
     btn.disabled = true;
-    const fd = new FormData(e.target);
     const imageInput = document.getElementById('image-input');
     const file = imageInput.files[0];
 
@@ -78,15 +75,18 @@ document.getElementById('form-expense').addEventListener('submit', async e => {
         }
 
         const body = {
-            category: fd.get('category'),
-            amount: Number(fd.get('amount')),
-            description: fd.get('description') || null,
+            category: document.getElementById('exp-category').value,
+            amount: Number(document.getElementById('exp-amount').value),
+            description: document.getElementById('exp-description').value || null,
             imageData: imageData
         };
 
         await apiFetch('/expenses', { method: 'POST', body: JSON.stringify(body) });
         toast('Udgift gemt');
-        e.target.reset();
+        document.getElementById('exp-category').value = '';
+        document.getElementById('exp-amount').value = '';
+        document.getElementById('exp-description').value = '';
+        imageInput.value = '';
         document.getElementById('image-preview').style.display = 'none';
         loadExpenses();
     } catch (err) {
@@ -94,6 +94,6 @@ document.getElementById('form-expense').addEventListener('submit', async e => {
     } finally {
         btn.disabled = false;
     }
-});
+}
 
 document.addEventListener('DOMContentLoaded', loadExpenses);
