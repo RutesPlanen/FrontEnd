@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistik – Q-Genbrug</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .stat-row { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 900px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <a class="sidebar-logo" href="/restauranter.html">
+        <div class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div><div class="logo-name">Q-Genbrug</div><div class="logo-sub">Pantindsamling</div></div>
+    </a>
+    <div class="sidebar-nav">
+        <div class="nav-section">Overblik</div>
+        <a class="nav-item active" href="/statistik.html" data-page="/statistik.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Statistik</a>
+        <div class="nav-section">Håndtering</div>
+        <a class="nav-item" href="/anmodninger.html" data-page="/anmodninger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Anmodninger</a>
+        <a class="nav-item" href="/afhentninger.html" data-page="/afhentninger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Afhentninger</a>
+        <a class="nav-item" href="/udgifter.html" data-page="/udgifter.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Udgifter</a>
+        <div class="nav-section">Administration</div>
+        <a class="nav-item" href="/restauranter.html" data-page="/restauranter.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>Restauranter</a>
+        <a class="nav-item" href="/brugere.html" data-page="/brugere.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.87"/></svg>Brugere</a>
+    </div>
+    <div class="sidebar-footer">
+        <div class="user-tile" onclick="logout()">
+            <div class="user-avatar" id="user-avatar">–</div>
+            <div class="user-info"><div class="user-name" id="user-name">…</div><div class="user-role" id="user-role"></div></div>
+            <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+    </div>
+</aside>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Statistik</div>
+            <div class="page-subtitle">Indsamlinger, omsætning og driftsomkostninger over tid.</div>
+        </div>
+        <div class="page-actions">
+            <select id="period-select" style="padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <option>12 uger</option><option>6 mdr</option><option>År</option>
+            </select>
+        </div>
+    </div>
+
+    <main>
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+                <div class="stat-label">Indsamlede poser</div>
+                <div class="stat-value" id="stat-total-bags">–</div>
+                <div class="stat-sub">Seneste 12 uger</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div class="stat-label">Omsætning</div>
+                <div class="stat-value" id="stat-omsetning">–</div>
+                <div class="stat-sub">1,50 kr. per pose</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div class="stat-label">Omkostninger</div>
+                <div class="stat-value" id="stat-total-cost">–</div>
+                <div class="stat-sub">Drift, brændstof, m.m.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+                <div class="stat-label">Netto til projekter</div>
+                <div class="stat-value" id="stat-netto">–</div>
+                <div class="stat-sub" id="stat-netto-pct">–% af omsætning</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Poser per uge</span>
+                    <span class="card-hint">Seneste 12 uger</span>
+                </div>
+                <canvas id="chart-pickups"></canvas>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Omkostninger per uge</span>
+                    <span class="card-hint">Brændstof, drift, vedligehold</span>
+                </div>
+                <canvas id="chart-costs"></canvas>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Top restauranter</span>
+                    <span class="card-hint">Efter antal poser</span>
+                </div>
+                <canvas id="chart-bags"></canvas>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Chauffør aktivitet</span>
+                    <span class="card-hint">Antal afhentninger</span>
+                </div>
+                <canvas id="chart-chauffeurs"></canvas>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    Chart.defaults.color = '#475569';
+    Chart.defaults.borderColor = '#252c3f';
+    Chart.defaults.font.family = "'DM Sans', sans-serif";
+    Chart.defaults.font.size = 11;
+
+    const TOOLTIP = {
+      backgroundColor: '#1a1e2a',
+      borderColor: '#252c3f',
+      borderWidth: 1,
+      titleColor: '#e2e8f0',
+      bodyColor: '#94a3b8',
+      padding: 10,
+      cornerRadius: 8,
+      displayColors: false,
+    };
+
+    function bar(id, labels, data, color) {
+      new Chart(document.getElementById(id).getContext('2d'), {
+        type: 'bar',
+        data: { labels, datasets: [{ data, backgroundColor: color + '22', borderColor: color, borderWidth: 1.5, borderRadius: 4, borderSkipped: false }] },
+        options: { responsive: true, plugins: { legend: { display: false }, tooltip: TOOLTIP }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#252c3f' }, beginAtZero: true, ticks: { precision: 0 } } } }
+      });
+    }
+
+    function line(id, labels, data, color) {
+      new Chart(document.getElementById(id).getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets: [{ data, borderColor: color, backgroundColor: color + '12', borderWidth: 2, pointRadius: 3, pointBackgroundColor: color, tension: 0.35, fill: true }] },
+        options: { responsive: true, plugins: { legend: { display: false }, tooltip: TOOLTIP }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#252c3f' }, beginAtZero: true } } }
+      });
+    }
+
+    async function loadStatistik() {
+      try {
+        const s = await apiFetch('/statistics');
+        const bags = s.poserTotal;
+        const cost = s.omkostningerTotal;
+        const rev  = bags * 1.5;
+        const net  = rev - cost;
+        const pct  = rev > 0 ? Math.round((net / rev) * 100) : 0;
+
+        document.getElementById('stat-total-bags').textContent = bags.toLocaleString('da-DK');
+        document.getElementById('stat-omsetning').textContent  = rev.toLocaleString('da-DK', { maximumFractionDigits: 0 }) + ' kr.';
+        document.getElementById('stat-total-cost').textContent = cost.toLocaleString('da-DK', { maximumFractionDigits: 0 }) + ' kr.';
+        document.getElementById('stat-netto').textContent = (net >= 0 ? '+' : '') + net.toLocaleString('da-DK', { maximumFractionDigits: 0 }) + ' kr.';
+        document.getElementById('stat-netto').style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+        document.getElementById('stat-netto-pct').textContent = pct + '% af omsætning';
+
+        const wl = x => 'U' + (x.label.split('-')[1] || x.label);
+        bar('chart-pickups',   s.afhentningerPerMaaned.map(wl), s.afhentningerPerMaaned.map(x => x.value), '#3b82f6');
+        line('chart-costs',    s.omkostningerPerMaaned.map(wl), s.omkostningerPerMaaned.map(x => x.value), '#f87171');
+        bar('chart-bags',      s.poserPerRestaurant.map(x => x.label),   s.poserPerRestaurant.map(x => x.value),   '#34d399');
+        bar('chart-chauffeurs',s.chauffeurAktivitet.map(x => x.label),   s.chauffeurAktivitet.map(x => x.value),   '#f59e0b');
+      } catch { toast('Kunne ikke hente statistik', 'error'); }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadStatistik);
+</script>
+</body>
+</html>

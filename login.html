@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log ind – RutesPlanen</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f4f6f8;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.12);
+            padding: 36px 40px;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .login-box h1 {
+            font-size: 1.4rem;
+            color: #1a73e8;
+            margin-bottom: 6px;
+        }
+
+        .login-box p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .login-box form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .login-box label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .login-box input {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        .login-box button {
+            padding: 11px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .login-box button:hover { background: #1558b0; }
+
+        .error-msg {
+            color: #dc3545;
+            font-size: 0.85rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h1>RutesPlanen</h1>
+    <p>Log ind for at fortsætte</p>
+    <form id="login-form">
+        <label>
+            Email
+            <input type="email" id="email" placeholder="email@eksempel.dk" required />
+        </label>
+        <label>
+            Adgangskode
+            <input type="password" id="password" placeholder="Adgangskode" required />
+        </label>
+        <p class="error-msg" id="error-msg">Forkert email eller adgangskode</p>
+        <p style="font-size:0.8rem;color:#aaa;text-align:center;margin-top:8px">
+            Standard admin: admin@rutesplanen.dk / admin123
+        </p>
+        <button type="submit">Log ind</button>
+    </form>
+</div>
+
+<script>
+    const ROLE_ACCESS = {
+        ADMIN:      ['/restauranter.html', '/brugere.html', '/anmodninger.html', '/afhentninger.html', '/udgifter.html', '/statistik.html'],
+        RESTAURANT: ['/restaurant-dashboard.html'],
+        CHAUFFEUR:  ['/chauffeur-dashboard.html', '/map.html', '/kosten.html']
+    };
+
+    try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (token && user && user.role) {
+            window.location.href = (ROLE_ACCESS[user.role] || [])[0] || '/restauranter.html';
+        }
+    } catch {
+        localStorage.clear();
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errEl = document.getElementById('error-msg');
+        errEl.style.display = 'none';
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!res.ok) {
+                errEl.textContent = res.status === 401
+                    ? 'Forkert email eller adgangskode'
+                    : `Serverfejl (${res.status}) – prøv igen`;
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const data = await res.json();
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            const redirect = (ROLE_ACCESS[data.user.role] || [])[0] || '/restauranter.html';
+            window.location.href = redirect;
+        } catch {
+            errEl.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>
