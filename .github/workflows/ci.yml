@@ -1,0 +1,28 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev, main ]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Byg Docker image
+        run: docker build -t frontend .
+      - name: Kør Docker container
+
+        run: |
+          docker network create test-net
+          docker run -d --network test-net --name backend alpine sleep 60
+          docker run -d -p 80:80 --network test-net --name frontend-test frontend
+          sleep 3
+          docker logs frontend-test
+          curl -f http://localhost || exit 1
